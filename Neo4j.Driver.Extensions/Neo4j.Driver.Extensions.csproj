@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Chris Skardon</Authors>
+    <Company>Anabranch Ltd</Company>
+    <Description>Extensions to the Neo4j.Driver to make it a bit easier to use.</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/DotNet4Neo4j/Neo4j.Driver.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DotNet4Neo4j/Neo4j.Driver.Extensions</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>neo4j, nosql, database</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\Projects\Github\DotNet4Neo4J\Neo4j.Driver.Extensions\Neo4j.Drive.Extensions\Neo4j.Driver.Extensions.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ensure.That" Version="9.2.0" />
+    <PackageReference Include="Neo4j.Driver.Signed" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
