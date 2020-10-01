@@ -1,6 +1,7 @@
 ﻿namespace Neo4j.Driver.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using EnsureThat;
 
@@ -17,28 +18,19 @@
         /// </example>
         /// <typeparam name="T">The <see cref="Type"/> to cast to.</typeparam>
         /// <param name="record">The <see cref="IRecord"/> to cast from.</param>
+        /// <param name="identifier">If supplied, this will try to pull an object from the identifier given.</param>
         /// <returns>An object of type <typeparamref name="T"/>.</returns>
         /// <exception cref="ArgumentNullException">If the <paramref name="record" /> is null.</exception>
-        public static T ToObject<T>(this IRecord record) where T : new()
+        public static T ToObject<T>(this IRecord record, string identifier = null) where T : new()
         {
             Ensure.That(record).IsNotNull();
 
+            if (!string.IsNullOrWhiteSpace(identifier))
+                return record[identifier].As<IDictionary<string, object>>().ToObject<T>();
+
             var obj = new T();
-            foreach (var property in typeof(T).GetProperties().Where(x => x.CanWrite))
-            {
-                var propertyName = property.Name;
-
-                var neo4jProperty = property.GetNeo4jPropertyAttribute();
-                if (neo4jProperty != null)
-                {
-                    if (neo4jProperty.Ignore)
-                        continue;
-
-                    propertyName = neo4jProperty.Name ?? propertyName;
-                }
-
-                property.SetValue(obj, record.GetValue(propertyName, property.PropertyType));
-            }
+            foreach (var property in typeof(T).GetValidProperties())
+                property.Property.SetValue(obj, record.GetValue(property.SerializedName, property.Property.PropertyType));
 
             return obj;
         }
@@ -55,6 +47,9 @@
         /// </exception>
         public static T GetValue<T>(this IRecord record, string identifier)
         {
+            Ensure.That(record).IsNotNull();
+            Ensure.That(identifier).IsNotEmptyOrWhiteSpace();
+
             return record.Keys.Contains(identifier)
                 ? record.Values[identifier].As<T>()
                 : default;

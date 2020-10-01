@@ -1,9 +1,33 @@
 ﻿namespace Neo4j.Driver.Extensions
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using EnsureThat;
 
     public static class ResultCursorExtensions
     {
+        public static T GetValue<T>(this IResultCursor cursor, string identifier)
+        {
+            Ensure.That(cursor).IsNotNull();
+            Ensure.That(identifier).IsNotNullOrWhiteSpace();
+
+            return cursor.Current.Keys.Contains(identifier)
+                ? cursor.Current[identifier].As<T>()
+                : default;
+        }
+
+        public static T GetValueStrict<T>(this IResultCursor cursor, string identifier)
+        {
+            Ensure.That(cursor).IsNotNull();
+            Ensure.That(identifier).IsNotNullOrWhiteSpace();
+
+            if(cursor.Current.Keys.Contains(identifier))
+                return cursor.Current[identifier].As<T>();
+            
+            throw new KeyNotFoundException($"'{identifier}' not returned from the query.");
+        }
+
         /// <summary>
         ///     Simplifies the <c>while</c>, <see cref="IResultCursor.FetchAsync" /> pairing, allowing a called to just use a
         ///     <see cref="foreach" />.

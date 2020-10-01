@@ -4,6 +4,22 @@
         <name>Neo4j.Driver.Extensions</name>
     </assembly>
     <members>
+        <member name="M:Neo4j.Driver.Extensions.DictionaryExtensions.ToObject``1(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Attempts to convert a <see cref="T:System.Collections.Generic.IDictionary`2"/> to a type defined by <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type to convert to.</typeparam>
+            <param name="dictionary">The dictionary containing the properties to be converted</param>
+            <returns>An object of type <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.DictionaryExtensions.AsInternal(System.Object,System.Type)">
+            <summary>
+            An internal way to call the <see cref="M:Neo4j.Driver.ValueExtensions.As``1(System.Object,``0)"/> method.
+            </summary>
+            <param name="o">The object instance to attempt to coerce.</param>
+            <param name="propertyType">The type to try to coerce the <paramref name="o"/> to.</param>
+            <returns>An object boxing the <paramref name="o"/> converted to <paramref name="propertyType"/>.</returns>
+        </member>
         <member name="T:Neo4j.Driver.Extensions.Neo4jPropertyAttribute">
             <summary>
                 Allows the property in Neo4j to be mapped to a different name in a class.
@@ -102,7 +118,7 @@
             <returns>A filled <see cref="T:Neo4j.Driver.Extensions.Neo4jPropertyAttribute" /> instance, or default values otherwise.</returns>
             <exception cref="T:System.ArgumentNullException">If the <paramref name="property" /> is null.</exception>
         </member>
-        <member name="M:Neo4j.Driver.Extensions.RecordExtensions.ToObject``1(Neo4j.Driver.IRecord)">
+        <member name="M:Neo4j.Driver.Extensions.RecordExtensions.ToObject``1(Neo4j.Driver.IRecord,System.String)">
             <summary>
                 Attempts to cast an <see cref="T:Neo4j.Driver.IRecord"/> instance into a <typeparamref name="T"/>.
             </summary>
@@ -114,6 +130,7 @@
             </example>
             <typeparam name="T">The <see cref="T:System.Type"/> to cast to.</typeparam>
             <param name="record">The <see cref="T:Neo4j.Driver.IRecord"/> to cast from.</param>
+            <param name="identifier">If supplied, this will try to pull an object from the identifier given.</param>
             <returns>An object of type <typeparamref name="T"/>.</returns>
             <exception cref="T:System.ArgumentNullException">If the <paramref name="record" /> is null.</exception>
         </member>
@@ -159,7 +176,7 @@
                 NB. If you want to pull more than just one property from the <paramref name="cursor" />, don't use this method, use
                 <see cref="M:Neo4j.Driver.Extensions.ResultCursorExtensions.GetRecords(Neo4j.Driver.IResultCursor)" /> instead.
             </remarks>
-            <typeparam name="T">The <see cref="!:Type" /> to try to get the <paramref name="identifier" /> as.</typeparam>
+            <typeparam name="T">The <see cref="T:System.Type" /> to try to get the <paramref name="identifier" /> as.</typeparam>
             <param name="cursor">The <see cref="T:Neo4j.Driver.IResultCursor" /> instance to read from.</param>
             <param name="identifier">The identifier to pull out from.</param>
             <returns><c>yield</c>s the <typeparamref name="T" /> retrieved from the <paramref name="cursor" />.</returns>

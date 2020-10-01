@@ -16,6 +16,12 @@
     <Copyright>2020 Chris Skardon</Copyright>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Neo4j.Drivers.Extensions.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>D:\Projects\Github\DotNet4Neo4J\Neo4j.Driver.Extensions\Neo4j.Driver.Extensions\Neo4j.Driver.Extensions.xml</DocumentationFile>
   </PropertyGroup>
