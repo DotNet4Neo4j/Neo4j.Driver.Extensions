@@ -11,10 +11,13 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>neo4j, nosql, database</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Copyright>2020 Chris Skardon</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Projects\Github\DotNet4Neo4J\Neo4j.Driver.Extensions\Neo4j.Drive.Extensions\Neo4j.Driver.Extensions.xml</DocumentationFile>
+    <DocumentationFile>D:\Projects\Github\DotNet4Neo4J\Neo4j.Driver.Extensions\Neo4j.Driver.Extensions\Neo4j.Driver.Extensions.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
