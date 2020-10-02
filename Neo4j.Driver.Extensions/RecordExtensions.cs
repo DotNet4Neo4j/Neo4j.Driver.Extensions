@@ -5,6 +5,9 @@
     using System.Linq;
     using EnsureThat;
 
+    /// <summary>
+    /// Extension methods for the <see cref="IRecord"/>
+    /// </summary>
     public static class RecordExtensions
     {
         /// <summary>
@@ -34,6 +37,7 @@
 
             return obj;
         }
+
         /// <summary>
         ///     Gets a value from an <see cref="IRecord" /> instance.
         /// </summary>
@@ -53,6 +57,25 @@
             return record.Keys.Contains(identifier)
                 ? record.Values[identifier].As<T>()
                 : default;
+        }
+
+        /// <summary>
+        ///     Gets a value from an <see cref="IRecord" /> instance. Throwing a <see cref="KeyNotFoundException"/> if the property isn't there.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type" /> to attempt to get the property as.</typeparam>
+        /// <param name="record">The <see cref="IRecord" /> instance to pull the property from.</param>
+        /// <param name="identifier">The name of the identifier to get.</param>
+        /// <returns>The converted <typeparamref name="T" /> or <c>default</c></returns>
+        /// <exception cref="KeyNotFoundException">Thrown if the property doesn't exist</exception>
+        public static T GetValueStrict<T>(this IRecord record, string identifier)
+        {
+            Ensure.That(record).IsNotNull();
+            Ensure.That(identifier).IsNotEmptyOrWhiteSpace();
+
+            if(record.Keys.Contains(identifier))
+                return record.Values[identifier].As<T>();
+            
+            throw new KeyNotFoundException($"'{identifier}' doesn't exist on the Record.");
         }
 
         /// <summary>

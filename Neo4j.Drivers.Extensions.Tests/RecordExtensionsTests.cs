@@ -98,6 +98,91 @@
                 var stringResult = mock.Object.GetValue<string>("not-there");
                 stringResult.Should().Be(default);
             }
+
+            [Fact]
+            public void ReturnsCorrectValue()
+            {
+                const string stringIdentifier = "foo";
+                const string intIdentifier = "bar";
+                const string expectedStringValue = "string";
+                const int expectedIntValue = 42;
+
+                var mock = new Mock<IRecord>();
+
+
+                mock.Setup(x => x.Keys).Returns(new List<string> { stringIdentifier, intIdentifier });
+                mock.Setup(x => x.Values).Returns(new Dictionary<string, object>
+                {
+                    {stringIdentifier, expectedStringValue},
+                    {intIdentifier, expectedIntValue}
+                });
+
+                mock.Object.GetValue<int>(intIdentifier).Should().Be(expectedIntValue);
+                mock.Object.GetValue<string>(stringIdentifier).Should().Be(expectedStringValue);
+            }
+        }
+
+        public class GetValueStrictT
+        {
+            [Fact]
+            public void ThrowsArgumentNullException_WhenRecordIsNull()
+            {
+                var ex = Assert.Throws<ArgumentNullException>(() => RecordExtensions.GetValueStrict<string>(null, "identifier"));
+                ex.Should().NotBeNull();
+            }
+
+            [Fact]
+            public void ThrowsArgumentNullException_WhenIdentifierIsNull()
+            {
+                var mock = new Mock<IRecord>();
+
+                var ex = Assert.Throws<ArgumentNullException>(() => mock.Object.GetValueStrict<string>(null));
+                ex.Should().NotBeNull();
+            }
+
+            [Theory]
+            [InlineData("")]
+            [InlineData(" ")]
+            public void ThrowsArgumentException_WhenIdentifierIsNull(string identifier)
+            {
+                var mock = new Mock<IRecord>();
+
+                var ex = Assert.Throws<ArgumentException>(() => mock.Object.GetValueStrict<string>(identifier));
+                ex.Should().NotBeNull();
+            }
+
+            [Fact]
+            public void ReturnsDefault_WhenIdentifierNotThere()
+            {
+                var mock = new Mock<IRecord>();
+                mock.Setup(x => x.Keys).Returns(new List<string>());
+                mock.Setup(x => x.Values).Returns(new Dictionary<string, object>());
+
+              var ex = Assert.Throws<KeyNotFoundException>(() => mock.Object.GetValueStrict<int>("not-there"));
+              ex.Should().NotBeNull();
+            }
+
+            [Fact]
+            public void ReturnsCorrectValue()
+            {
+                const string stringIdentifier = "foo";
+                const string intIdentifier = "bar";
+                const string expectedStringValue = "string";
+                const int expectedIntValue = 42;
+
+                var mock = new Mock<IRecord>();
+
+
+                mock.Setup(x => x.Keys).Returns(new List<string>{stringIdentifier, intIdentifier});
+                mock.Setup(x => x.Values).Returns(new Dictionary<string, object>
+                {
+                    {stringIdentifier, expectedStringValue},
+                    {intIdentifier, expectedIntValue}
+                });
+
+                mock.Object.GetValueStrict<int>(intIdentifier).Should().Be(expectedIntValue);
+                mock.Object.GetValueStrict<string>(stringIdentifier).Should().Be(expectedStringValue);
+            }
         }
     }
 }
