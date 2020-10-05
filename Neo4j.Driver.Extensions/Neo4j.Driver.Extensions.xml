@@ -160,9 +160,23 @@
             <returns>A filled <see cref="T:Neo4j.Driver.Extensions.Neo4jPropertyAttribute" /> instance, or default values otherwise.</returns>
             <exception cref="T:System.ArgumentNullException">If the <paramref name="property" /> is null.</exception>
         </member>
+        <member name="T:Neo4j.Driver.Extensions.ObjectExtensions">
+            <summary>
+            Extension methods for the <see cref="T:System.Object"/> class.
+            </summary>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.ObjectExtensions.TryAs``1(System.Object,``0@)">
+            <summary>
+            A helper method to explicitly cast the value streamed back via Bolt to a local type. 
+            </summary>
+            <typeparam name="T">The type to attempt to convert to.</typeparam>
+            <param name="obj">The value that streamed back via Bolt protocol, e.g.Properties.</param>
+            <param name="value">The value converted to <typeparamref name="T"/>, default(T) otherwise.</param>
+            <returns><c>true</c> if the <paramref name="obj"/> could be converted, <c>false</c> otherwise.</returns>
+        </member>
         <member name="T:Neo4j.Driver.Extensions.RecordExtensions">
             <summary>
-            Extension methods for the <see cref="T:Neo4j.Driver.IRecord"/>
+            Extension methods for the <see cref="T:Neo4j.Driver.IRecord"/> interface.
             </summary>
         </member>
         <member name="M:Neo4j.Driver.Extensions.RecordExtensions.ToObject``1(Neo4j.Driver.IRecord,System.String)">

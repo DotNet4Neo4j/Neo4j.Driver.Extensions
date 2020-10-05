@@ -66,6 +66,48 @@
             }
 
             [Fact]
+            public async Task GetsResults_WhenIsINode()
+            {
+                const string identifier = "foo";
+                const string expectedStringProperty = "string";
+
+                var mockSession = new Mock<IAsyncSession>();
+                var mockTransaction = new Mock<IAsyncTransaction>();
+                var mockCursor = new Mock<IResultCursor>();
+                var mockRecord = new Mock<IRecord>();
+                var mockNode = new Mock<INode>();
+                mockNode.Setup(x => x.Properties).Returns(new Dictionary<string, object>
+                {
+                    {nameof(Foo.StringProperty), expectedStringProperty}
+                });
+
+                mockRecord.Setup(x => x.Keys).Returns(new List<string> { identifier });
+                mockRecord.Setup(x => x[identifier]).Returns(mockNode.Object);
+                
+                mockCursor.Setup(x => x.FetchAsync()).Returns(Task.FromResult(true))
+                    .Callback(() =>
+                    {
+                        mockCursor.Reset();
+                        mockCursor.Setup(x => x.Current).Returns(mockRecord.Object);
+                        mockCursor.Setup(x => x.FetchAsync()).Returns(Task.FromResult(false));
+                    });
+
+                mockTransaction
+                    .Setup(x => x.RunAsync(It.IsAny<string>(), It.IsAny<object>()))
+                    .Returns(Task.FromResult(mockCursor.Object));
+
+                List<Foo> callBackResponse = null;
+                mockSession
+                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>()))
+                    .Callback(async (Func<IAsyncTransaction, Task<List<Foo>>> func) => callBackResponse = await func(mockTransaction.Object));
+
+                await mockSession.Object.RunReadTransactionForObjects<Foo>("Query", null, identifier);
+                callBackResponse.Should().NotBeNull();
+                callBackResponse.Should().HaveCount(1);
+                callBackResponse[0].StringProperty.Should().Be(expectedStringProperty);
+            }
+
+            [Fact]
             public async Task GetsResults()
             {
                 const string identifier = "foo";

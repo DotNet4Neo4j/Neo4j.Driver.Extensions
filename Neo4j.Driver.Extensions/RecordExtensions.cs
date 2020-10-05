@@ -6,7 +6,7 @@
     using EnsureThat;
 
     /// <summary>
-    /// Extension methods for the <see cref="IRecord"/>
+    /// Extension methods for the <see cref="IRecord"/> interface.
     /// </summary>
     public static class RecordExtensions
     {
@@ -29,7 +29,11 @@
             Ensure.That(record).IsNotNull();
 
             if (!string.IsNullOrWhiteSpace(identifier))
-                return record[identifier].As<IDictionary<string, object>>().ToObject<T>();
+            {
+                return record[identifier].TryAs<INode>(out var node) 
+                    ? node.ToObject<T>() 
+                    : record[identifier].As<IDictionary<string, object>>().ToObject<T>();
+            }
 
             var obj = new T();
             foreach (var property in typeof(T).GetValidProperties())
