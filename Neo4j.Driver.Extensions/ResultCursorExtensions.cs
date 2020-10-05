@@ -69,6 +69,7 @@
                 : cursor.Current.GetValue<T>(identifier);
         }
 
+#if NETSTANDARD2_1
         /// <summary>
         ///     Simplifies the <c>while</c>, <see cref="IResultCursor.FetchAsync" /> pairing, allowing a called to just use a
         ///     <see cref="foreach" />.
@@ -113,5 +114,6 @@
                 fetched = await cursor.FetchAsync();
             }
         }
+#endif
     }
 }
