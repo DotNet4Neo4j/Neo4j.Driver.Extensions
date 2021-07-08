@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Authors>Chris Skardon</Authors>
+    <Authors>Charlotte Skardon</Authors>
     <Company>Anabranch Ltd</Company>
     <Description>Extensions to the Neo4j.Driver to make it a bit easier to use.</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
