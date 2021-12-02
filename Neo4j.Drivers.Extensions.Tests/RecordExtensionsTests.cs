@@ -1,11 +1,17 @@
-﻿namespace Neo4j.Drivers.Extensions.Tests
+﻿using System.ComponentModel;
+
+namespace Neo4j.Drivers.Extensions.Tests
 {
     using System;
+    using System.ComponentModel;
     using System.Collections.Generic;
     using FluentAssertions;
     using Moq;
     using Neo4j.Driver;
     using Neo4j.Driver.Extensions;
+
+    using Neo4jClient;
+
     using Xunit;
 
     public class RecordExtensionsTests
@@ -38,6 +44,19 @@
             }
 
             [Fact]
+            public void TreatsRecordAsRelationShip_WhenIdentifierSupplied()
+            {
+                const string identifier = "foo";
+                const string stringPropertyValue = "baa";
+
+                var mock = new Mock<IRecord>();
+                mock.Setup(x => x[identifier]).Returns(new TestRelationship(new NodeReference(1), new { StringProperty = stringPropertyValue }));
+
+                var foo = mock.Object.ToObject<Foo>(identifier);
+                foo.StringProperty.Should().Be(stringPropertyValue);
+            }
+
+            [Fact]
             public void AssumesAllTheResponseIsAnObject_WhenIdentifierNotSupplied()
             {
                 const string stringPropertyValue = "baa";
@@ -45,7 +64,7 @@
 
                 var mock = new Mock<IRecord>();
                 mock.Setup(x => x.Keys).Returns(new List<string> { "StringProperty", "stringPropertyWithAttribute" });
-                mock.Setup(x => x.Values).Returns( new Dictionary<string, object> {
+                mock.Setup(x => x.Values).Returns(new Dictionary<string, object> {
                     {"StringProperty", stringPropertyValue},
                     {"stringPropertyWithAttribute", stringPropertyWithAttributeValue},
                 });
@@ -54,6 +73,39 @@
                 foo.StringProperty.Should().Be(stringPropertyValue);
                 foo.StringPropertyWithAttribute.Should().Be(stringPropertyWithAttributeValue);
             }
+        }
+
+        public class TestRelationship : Relationship,
+            IRelationshipAllowingSourceNode<Foo>, IRelationship
+        {
+            public TestRelationship(NodeReference targetNode, object data) : base(targetNode, data)
+            {
+                var dictionary = new Dictionary<string, object>();
+
+                foreach (var propDesc in data.GetType().GetProperties())
+                {
+                    dictionary.Add(propDesc.Name, propDesc.GetValue(data));
+                }
+                this.Properties = dictionary;
+            }
+
+            public override string RelationshipTypeKey
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public object this[string key] => throw new NotImplementedException();
+
+            public IReadOnlyDictionary<string, object> Properties { get; }
+            public long Id { get; }
+            public bool Equals(IRelationship other)
+            {
+                throw new NotImplementedException();
+            }
+
+            public string Type { get; }
+            public long StartNodeId { get; }
+            public long EndNodeId { get; }
         }
 
         public class GetValueT
@@ -158,8 +210,8 @@
                 mock.Setup(x => x.Keys).Returns(new List<string>());
                 mock.Setup(x => x.Values).Returns(new Dictionary<string, object>());
 
-              var ex = Assert.Throws<KeyNotFoundException>(() => mock.Object.GetValueStrict<int>("not-there"));
-              ex.Should().NotBeNull();
+                var ex = Assert.Throws<KeyNotFoundException>(() => mock.Object.GetValueStrict<int>("not-there"));
+                ex.Should().NotBeNull();
             }
 
             [Fact]
@@ -173,7 +225,7 @@
                 var mock = new Mock<IRecord>();
 
 
-                mock.Setup(x => x.Keys).Returns(new List<string>{stringIdentifier, intIdentifier});
+                mock.Setup(x => x.Keys).Returns(new List<string> { stringIdentifier, intIdentifier });
                 mock.Setup(x => x.Values).Returns(new Dictionary<string, object>
                 {
                     {stringIdentifier, expectedStringValue},
