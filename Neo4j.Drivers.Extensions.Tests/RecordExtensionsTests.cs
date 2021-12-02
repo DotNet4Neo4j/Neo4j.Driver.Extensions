@@ -10,8 +10,6 @@ namespace Neo4j.Drivers.Extensions.Tests
     using Neo4j.Driver;
     using Neo4j.Driver.Extensions;
 
-    using Neo4jClient;
-
     using Xunit;
 
     public class RecordExtensionsTests
@@ -49,8 +47,11 @@ namespace Neo4j.Drivers.Extensions.Tests
                 const string identifier = "foo";
                 const string stringPropertyValue = "baa";
 
+                var data = new Dictionary<string, object> { { "StringProperty", stringPropertyValue } };
                 var mock = new Mock<IRecord>();
-                mock.Setup(x => x[identifier]).Returns(new TestRelationship(new NodeReference(1), new { StringProperty = stringPropertyValue }));
+                var mockRelation = new Mock<IRelationship>(MockBehavior.Loose);
+                mockRelation.SetupGet(x => x.Properties).Returns(data);
+                mock.Setup(x => x[identifier]).Returns(mockRelation.Object);
 
                 var foo = mock.Object.ToObject<Foo>(identifier);
                 foo.StringProperty.Should().Be(stringPropertyValue);
@@ -73,39 +74,6 @@ namespace Neo4j.Drivers.Extensions.Tests
                 foo.StringProperty.Should().Be(stringPropertyValue);
                 foo.StringPropertyWithAttribute.Should().Be(stringPropertyWithAttributeValue);
             }
-        }
-
-        public class TestRelationship : Relationship,
-            IRelationshipAllowingSourceNode<Foo>, IRelationship
-        {
-            public TestRelationship(NodeReference targetNode, object data) : base(targetNode, data)
-            {
-                var dictionary = new Dictionary<string, object>();
-
-                foreach (var propDesc in data.GetType().GetProperties())
-                {
-                    dictionary.Add(propDesc.Name, propDesc.GetValue(data));
-                }
-                this.Properties = dictionary;
-            }
-
-            public override string RelationshipTypeKey
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public object this[string key] => throw new NotImplementedException();
-
-            public IReadOnlyDictionary<string, object> Properties { get; }
-            public long Id { get; }
-            public bool Equals(IRelationship other)
-            {
-                throw new NotImplementedException();
-            }
-
-            public string Type { get; }
-            public long StartNodeId { get; }
-            public long EndNodeId { get; }
         }
 
         public class GetValueT
