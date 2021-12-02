@@ -30,9 +30,17 @@
 
             if (!string.IsNullOrWhiteSpace(identifier))
             {
-                return record[identifier].TryAs<INode>(out var node) 
-                    ? node.ToObject<T>() 
-                    : record[identifier].As<IDictionary<string, object>>().ToObject<T>();
+                if (record[identifier].TryAs<INode>(out var node))
+                {
+                    return node.ToObject<T>();
+                }
+
+                if(record[identifier].TryAs<IRelationship>(out var relationship))
+                {
+                    return relationship.ToObject<T>();
+                }
+
+                return record[identifier].As<IDictionary<string, object>>().ToObject<T>();
             }
 
             var obj = new T();
