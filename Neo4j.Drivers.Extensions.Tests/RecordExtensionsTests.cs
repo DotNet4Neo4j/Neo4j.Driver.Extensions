@@ -1,11 +1,15 @@
-﻿namespace Neo4j.Drivers.Extensions.Tests
+﻿using System.ComponentModel;
+
+namespace Neo4j.Drivers.Extensions.Tests
 {
     using System;
+    using System.ComponentModel;
     using System.Collections.Generic;
     using FluentAssertions;
     using Moq;
     using Neo4j.Driver;
     using Neo4j.Driver.Extensions;
+
     using Xunit;
 
     public class RecordExtensionsTests
@@ -38,6 +42,22 @@
             }
 
             [Fact]
+            public void TreatsRecordAsRelationShip_WhenIdentifierSupplied()
+            {
+                const string identifier = "foo";
+                const string stringPropertyValue = "baa";
+
+                var data = new Dictionary<string, object> { { "StringProperty", stringPropertyValue } };
+                var mock = new Mock<IRecord>();
+                var mockRelation = new Mock<IRelationship>(MockBehavior.Loose);
+                mockRelation.SetupGet(x => x.Properties).Returns(data);
+                mock.Setup(x => x[identifier]).Returns(mockRelation.Object);
+
+                var foo = mock.Object.ToObject<Foo>(identifier);
+                foo.StringProperty.Should().Be(stringPropertyValue);
+            }
+
+            [Fact]
             public void AssumesAllTheResponseIsAnObject_WhenIdentifierNotSupplied()
             {
                 const string stringPropertyValue = "baa";
@@ -45,7 +65,7 @@
 
                 var mock = new Mock<IRecord>();
                 mock.Setup(x => x.Keys).Returns(new List<string> { "StringProperty", "stringPropertyWithAttribute" });
-                mock.Setup(x => x.Values).Returns( new Dictionary<string, object> {
+                mock.Setup(x => x.Values).Returns(new Dictionary<string, object> {
                     {"StringProperty", stringPropertyValue},
                     {"stringPropertyWithAttribute", stringPropertyWithAttributeValue},
                 });
@@ -158,8 +178,8 @@
                 mock.Setup(x => x.Keys).Returns(new List<string>());
                 mock.Setup(x => x.Values).Returns(new Dictionary<string, object>());
 
-              var ex = Assert.Throws<KeyNotFoundException>(() => mock.Object.GetValueStrict<int>("not-there"));
-              ex.Should().NotBeNull();
+                var ex = Assert.Throws<KeyNotFoundException>(() => mock.Object.GetValueStrict<int>("not-there"));
+                ex.Should().NotBeNull();
             }
 
             [Fact]
@@ -173,7 +193,7 @@
                 var mock = new Mock<IRecord>();
 
 
-                mock.Setup(x => x.Keys).Returns(new List<string>{stringIdentifier, intIdentifier});
+                mock.Setup(x => x.Keys).Returns(new List<string> { stringIdentifier, intIdentifier });
                 mock.Setup(x => x.Values).Returns(new Dictionary<string, object>
                 {
                     {stringIdentifier, expectedStringValue},
