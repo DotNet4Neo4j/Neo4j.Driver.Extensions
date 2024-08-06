@@ -62,7 +62,10 @@
             {
                 var mock = new Mock<IAsyncSession>();
                 await mock.Object.RunReadTransactionForObjects<Foo>("query", null, "id");
-                mock.Verify(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>()), Times.Once);
+                // mock.Verify(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>()), Times.Once);
+                mock.Verify(x => 
+                    x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>(),It.IsAny<Action<TransactionConfigBuilder>>()), 
+                    Times.Once);
             }
 
             [Fact]
@@ -98,10 +101,10 @@
 
                 List<Foo> callBackResponse = null;
                 mockSession
-                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>()))
-                    .Callback(async (Func<IAsyncTransaction, Task<List<Foo>>> func) => callBackResponse = await func(mockTransaction.Object));
+                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>(), It.IsAny<Action<TransactionConfigBuilder>>()))
+                    .Callback(async (Func<IAsyncTransaction, Task<List<Foo>>> func, Action<TransactionConfigBuilder> _) => callBackResponse = await func(mockTransaction.Object));
 
-                await mockSession.Object.RunReadTransactionForObjects<Foo>("Query", null, identifier);
+                await mockSession.Object.RunReadTransactionForObjects<Foo>("Query", null, identifier);  
                 callBackResponse.Should().NotBeNull();
                 callBackResponse.Should().HaveCount(1);
                 callBackResponse[0].StringProperty.Should().Be(expectedStringProperty);
@@ -137,8 +140,8 @@
 
                 List<Foo> callBackResponse = null;
                 mockSession
-                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>()))
-                    .Callback(async (Func<IAsyncTransaction, Task<List<Foo>>> func) => callBackResponse = await func(mockTransaction.Object));
+                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<Foo>>>>(), It.IsAny<Action<TransactionConfigBuilder>>()))
+                    .Callback(async (Func<IAsyncTransaction, Task<List<Foo>>> func, Action<TransactionConfigBuilder> _) => callBackResponse = await func(mockTransaction.Object));
 
                 await mockSession.Object.RunReadTransactionForObjects<Foo>("Query", null, identifier);
                 callBackResponse.Should().NotBeNull();
@@ -198,7 +201,7 @@
             {
                 var mock = new Mock<IAsyncSession>();
                 await mock.Object.RunReadTransaction<string>("query", null, "id");
-                mock.Verify(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<string>>>>()), Times.Once);
+                mock.Verify(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<string>>>>(), It.IsAny<Action<TransactionConfigBuilder>>()), Times.Once);
             }
 
             [Fact]
@@ -228,8 +231,11 @@
 
                 List<string> callBackResponse = null;
                 mockSession
-                    .Setup(x => x.ReadTransactionAsync(It.IsAny<Func<IAsyncTransaction, Task<List<string>>>>()))
-                    .Callback(async (Func<IAsyncTransaction, Task<List<string>>> func) => callBackResponse = await func(mockTransaction.Object));
+                    .Setup(x => x.ReadTransactionAsync(
+                        It.IsAny<Func<IAsyncTransaction, Task<List<string>>>>(), 
+                        It.IsAny<Action<TransactionConfigBuilder>>())
+                    )
+                    .Callback(async (Func<IAsyncTransaction, Task<List<string>>> func, Action<TransactionConfigBuilder> _) => callBackResponse = await func(mockTransaction.Object));
 
                 await mockSession.Object.RunReadTransaction<string>("Query", null, identifier);
                 callBackResponse.Should().NotBeNull();

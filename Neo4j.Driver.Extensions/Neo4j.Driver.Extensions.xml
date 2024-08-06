@@ -11,7 +11,25 @@
         </member>
         <member name="M:Neo4j.Driver.Extensions.AsyncSessionExtensions.RunReadTransactionForObjects``1(Neo4j.Driver.IAsyncSession,System.String,System.Object,System.String)">
             <summary>
-                Executes a <see cref="M:Neo4j.Driver.IAsyncSession.ReadTransactionAsync``1(System.Func{Neo4j.Driver.IAsyncTransaction,System.Threading.Tasks.Task{``0}})" /> transaction
+                Executes a <see cref="!:IAsyncSession.ReadTransactionAsync&lt;T&gt;(System.Func&lt;IAsyncTransaction,Task&lt;T&gt;&gt;)" /> transaction
+                returning the <typeparamref name="T" /> specified.
+            </summary>
+            <remarks>
+                This should be used with queries returning <see cref="T:Neo4j.Driver.INode" /> values, for example: <c>MATCH (n) RETURN n</c>
+            </remarks>
+            <typeparam name="T">The type to attempt to cast to. This should be a class.</typeparam>
+            <param name="session">The <see cref="T:Neo4j.Driver.IAsyncSession" /> to run the transaction on.</param>
+            <param name="query">The query to execute.</param>
+            <param name="parameters">The parameters to the query.</param>
+            <param name="identifier">
+                The identifier to cast into <typeparamref name="T" />. e.g. if the query is
+                <c>MATCH (n) RETURN n</c> the identifier is <c>n</c>.
+            </param>
+            <returns>The results of the query.</returns>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.AsyncSessionExtensions.RunExecuteReadAsyncForObjects``1(Neo4j.Driver.IAsyncSession,System.String,System.Object,System.String)">
+            <summary>
+                Executes a <see cref="M:Neo4j.Driver.IAsyncSession.ExecuteReadAsync``1(System.Func{Neo4j.Driver.IAsyncQueryRunner,System.Threading.Tasks.Task{``0}},System.Action{Neo4j.Driver.TransactionConfigBuilder})" /> transaction
                 returning the <typeparamref name="T" /> specified.
             </summary>
             <remarks>
@@ -29,7 +47,7 @@
         </member>
         <member name="M:Neo4j.Driver.Extensions.AsyncSessionExtensions.RunReadTransaction``1(Neo4j.Driver.IAsyncSession,System.String,System.Object,System.String)">
             <summary>
-                Executes a <see cref="M:Neo4j.Driver.IAsyncSession.ReadTransactionAsync``1(System.Func{Neo4j.Driver.IAsyncTransaction,System.Threading.Tasks.Task{``0}})" /> transaction
+                Executes a <see cref="!:IAsyncSession.ReadTransactionAsync&lt;T&gt;(System.Func&lt;IAsyncTransaction,Task&lt;T&gt;&gt;)" /> transaction
                 returning the <typeparamref name="T" /> specified.
             </summary>
             <remarks>
@@ -236,6 +254,77 @@
                 <typeparamref name="T" /> equivalents.
             </exception>
         </member>
+        <member name="T:Neo4j.Driver.Extensions.RelationshipExtensions">
+            <summary>
+            A collection of extensions for the <see cref="T:Neo4j.Driver.IRelationship"/> interface.
+            These should allow a user to deserialize things in an easier way.
+            </summary>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.RelationshipExtensions.GetValue``1(Neo4j.Driver.IRelationship,System.String)">
+            <summary>
+                Gets a value from an <see cref="T:Neo4j.Driver.IRelationship" /> instance.
+            </summary>
+            <typeparam name="T">The <see cref="T:System.Type" /> to attempt to get the property as.</typeparam>
+            <param name="relationship">The <see cref="T:Neo4j.Driver.IRelationship" /> instance to pull the property from.</param>
+            <param name="propertyName">The name of the property to get.</param>
+            <returns>The converted <typeparamref name="T" /> or <c>default</c></returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="relationship"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="propertyName"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if <paramref name="propertyName"/> is an empty string or whitespace.</exception>
+            <exception cref="T:System.FormatException">
+                If any of the properties on the <paramref name="relationship" /> can't be cast to their
+                <typeparamref name="T" /> equivalents.
+            </exception>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.RelationshipExtensions.GetValueStrict``1(Neo4j.Driver.IRelationship,System.String)">
+            <summary>
+                Gets a value from an <see cref="T:Neo4j.Driver.IRelationship" /> instance. Will throw a <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if the <paramref name="propertyName"/> isn't on the <paramref name="relationship"/>.
+            </summary>
+            <typeparam name="T">The <see cref="T:System.Type" /> to attempt to get the property as.</typeparam>
+            <param name="relationship">The <see cref="T:Neo4j.Driver.IRelationship" /> instance to pull the property from.</param>
+            <param name="propertyName">The name of the property to get.</param>
+            <returns>The converted <typeparamref name="T" /> or <c>default</c></returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="relationship"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="propertyName"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if <paramref name="propertyName"/> is an empty string or whitespace.</exception>
+            <exception cref="T:System.FormatException">
+                If any of the properties on the <paramref name="relationship" /> can't be cast to their
+                <typeparamref name="T" /> equivalents.
+            </exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if <paramref name="propertyName"/> is not in the <paramref name="relationship"/>.</exception>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.RelationshipExtensions.GetValue(Neo4j.Driver.IRelationship,System.String,System.Type,System.Boolean)">
+            <summary>
+                Gets a value from an <see cref="T:Neo4j.Driver.IRelationship" /> instance, by executing
+                the <see cref="M:Neo4j.Driver.Extensions.RelationshipExtensions.GetValue``1(Neo4j.Driver.IRelationship,System.String)" /> method via reflection.
+            </summary>
+            <remarks>This exists primarily to allow the <see cref="M:Neo4j.Driver.ValueExtensions.As``1(System.Object)" /> method to be used to cast.</remarks>
+            <param name="relationship">The <see cref="T:Neo4j.Driver.IRelationship" /> instance to pull the property from.</param>
+            <param name="propertyName">The name of the property to get.</param>
+            <param name="propertyType">The <see cref="T:System.Type" /> to convert the property to.</param>
+            <param name="strict">If <c>true</c> this will throw <see cref="T:System.Collections.Generic.KeyNotFoundException"/> if properties aren't found on the <see cref="!:relationship"/>.</param>
+            <returns>The converted value, as an <see cref="T:System.Object" />.</returns>
+            <exception cref="T:System.ArgumentNullException">If the <paramref name="relationship" /> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">If the <paramref name="propertyName" /> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">If the <paramref name="propertyType" /> is null.</exception>
+            <exception cref="T:System.InvalidCastException">
+                If any of the properties on the <paramref name="relationship" /> can't be cast to their
+                <typeparamref name="T" /> equivalents.
+            </exception>
+        </member>
+        <member name="M:Neo4j.Driver.Extensions.RelationshipExtensions.ToObject``1(Neo4j.Driver.IRelationship)">
+            <summary>
+                Attempts to cast the given <see cref="T:Neo4j.Driver.IRelationship" /> instance into a complex type.
+            </summary>
+            <typeparam name="T">The type to try to cast to.</typeparam>
+            <param name="relationship">The <see cref="T:Neo4j.Driver.IRelationship" /> instance to cast from.</param>
+            <returns>An instance of <typeparamref name="T" /> with it's properties set.</returns>
+            <exception cref="T:System.ArgumentNullException">If the <paramref name="relationship" /> is null.</exception>
+            <exception cref="T:System.InvalidCastException">
+                If any of the properties on the <paramref name="relationship" /> can't be cast to their
+                <typeparamref name="T" /> equivalents.
+            </exception>
+        </member>
         <member name="T:Neo4j.Driver.Extensions.ResultCursorExtensions">
             <summary>
                 Extension methods for the <see cref="T:Neo4j.Driver.IResultCursor" />
@@ -283,30 +372,6 @@
                 Thrown if the <paramref name="cursor" /> hasn't had
                 <see cref="M:Neo4j.Driver.IResultCursor.FetchAsync" /> called on it.
             </exception>
-        </member>
-        <member name="M:Neo4j.Driver.Extensions.ResultCursorExtensions.GetContent``1(Neo4j.Driver.IResultCursor,System.String)">
-            <summary>
-                Simplifies the <c>while</c>, <see cref="M:Neo4j.Driver.IResultCursor.FetchAsync" /> pairing, allowing a called to just use a
-                <see cref="!:foreach" />.
-            </summary>
-            <remarks>
-                You will want <typeparamref name="T" /> to be one of the ones that the <see cref="T:Neo4j.Driver.IDriver" /> can handle, i.e.
-                <see cref="T:Neo4j.Driver.INode" /> etc.<br />
-                NB. If you want to pull more than just one property from the <paramref name="cursor" />, don't use this method, use
-                <see cref="M:Neo4j.Driver.Extensions.ResultCursorExtensions.GetRecords(Neo4j.Driver.IResultCursor)" /> instead.
-            </remarks>
-            <typeparam name="T">The <see cref="T:System.Type" /> to try to get the <paramref name="identifier" /> as.</typeparam>
-            <param name="cursor">The <see cref="T:Neo4j.Driver.IResultCursor" /> instance to read from.</param>
-            <param name="identifier">The identifier to pull out from.</param>
-            <returns><c>yield</c>s the <typeparamref name="T" /> retrieved from the <paramref name="cursor" />.</returns>
-        </member>
-        <member name="M:Neo4j.Driver.Extensions.ResultCursorExtensions.GetRecords(Neo4j.Driver.IResultCursor)">
-            <summary>
-                Simplifies the <c>while</c>, <see cref="M:Neo4j.Driver.IResultCursor.FetchAsync" /> pairing, allowing a called to just use a
-                <see cref="!:foreach" />.
-            </summary>
-            <param name="cursor">The <see cref="T:Neo4j.Driver.IResultCursor" /> instance to read from.</param>
-            <returns><c>yield</c>s the <see cref="T:Neo4j.Driver.IRecord" /> retrieved from the <paramref name="cursor" />.</returns>
         </member>
     </members>
 </doc>
